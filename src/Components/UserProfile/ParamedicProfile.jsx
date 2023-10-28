@@ -104,7 +104,7 @@ function ParamedicProfile({ accountStateCheck }) {
             value={stateOptions.find(option => option.value === formData.paramedicState)}
             onChange={handleStateChange}
             options={stateOptions}
-            menuPlacement="bottom"  
+            menuPlacement="bottom"  // Force the dropdown to always open downwards
             className="caret-transparent w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
           />
         </div>

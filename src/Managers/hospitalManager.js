@@ -1,13 +1,11 @@
-import { doc, setDoc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
-import { collection } from "firebase/firestore";
-import { db } from "../Components/FireBase/Config";
+import { doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs } from "firebase/firestore";
+import {db} from "../Components/FireBase/Config";
 
 export default class HospitalManager {
     constructor(uid) {
         this.uid = uid;  // Store uid for later use
         this.hospitalRef = null;  // Initialize hospitalRef to null
         this.hospitalCollection = collection(db, 'Hospital');  // Reference to the Hospital collection
-        this.initializeHospitalRef(uid);  // Initialize or update hospitalRef
     }
 
     static async create(uid) {
@@ -15,29 +13,42 @@ export default class HospitalManager {
         await manager.initializeHospitalRef(uid);
         return manager;
     }
-    
+
     async initializeHospitalRef(uid) {
         const userDoc = await getDoc(doc(db, 'User', uid));
         if (!userDoc.exists) {
             throw new Error(`User document with uid ${uid} does not exist`);
         }
-        const userData = userDoc.data();
+
+        const hospitalCollection = collection(db, 'Hospital');
+        const querySnapshot = await getDocs(hospitalCollection);
+
+        querySnapshot.forEach((doc) => {
+            if (doc.data().userID === uid) {
+                this.hospitalRef = doc.ref;
+                return;
+            }
+        });
+
+        const userData = await userDoc.data();
         if (userData && userData.typeID) {
             this.hospitalRef = doc(db, 'Hospital', userData.typeID);  // Update hospitalRef with existing reference
         } else {
-            await this.createHospital(uid);  // Create a new hospital instance if none exists
+            await this.updateHospital(uid);  // Create a new hospital instance if none exists
         }
     }
 
-    async createHospital(uid, geolocation = {}, name = '', capacity = 0) {
+
+    async updateHospital(uid, name = '', address = "", capacity = 0) {
         if (!this.hospitalRef) {
             // Creating a new hospital document
-            const newHospitalRef = await this.hospitalCollection.add({
+            const newHospitalRef = await doc(collection(db, 'Hospital'));
+            await setDoc(newHospitalRef, {
                 userID: uid,
-                geolocation: geolocation,
                 hospitalName: name,
                 availableRooms: 0,
                 totalRooms: 0,
+                address: address,
                 rooms: []
             });
             this.hospitalRef = newHospitalRef;  // Update hospitalRef with the new reference
@@ -69,22 +80,27 @@ export default class HospitalManager {
             lastUpdated: new Date()  // Set the lastUpdated field to the current date and time
         }
 
+
         await updateDoc(this.hospitalRef, {
             totalRooms: data.totalRooms + 1,
             availableRooms: data.availableRooms + 1,
             rooms: [...data.rooms, room]
         });
     }
-    async updateRoomAvailability(roomName, isAvailable) {
+
+    async updateRoomAvailability(roomIndex, isAvailable) {
         if (!this.hospitalRef) {
             throw new Error("Hospital not initiated");
         }
 
         const data = (await getDoc(this.hospitalRef)).data();
+        if (roomIndex < 0 || roomIndex >= data.rooms.length) {
+            throw new Error("Invalid room index");
+        }
 
-        const updatedRooms = data.rooms.map(room => {
-            if (room.roomName === roomName) {
-                return { ...room, isAvailable, lastUpdated: new Date() };
+        const updatedRooms = data.rooms.map((room, index) => {
+            if (index === roomIndex) {
+                return {...room, isAvailable, lastUpdated: new Date()};
             }
             return room;
         });
@@ -101,7 +117,8 @@ export default class HospitalManager {
         }
 
         const data = (await getDoc(this.hospitalRef)).data();
-        return data.rooms.filter(room => room.isAvailable);
+
+        return data.rooms.filter(room => room.isAvailable).length;
     }
 
     async getTotalRooms() {
@@ -111,5 +128,25 @@ export default class HospitalManager {
 
         const data = (await getDoc(this.hospitalRef)).data();
         return data.rooms.length;
+    }
+
+
+    async getHospitalName() {
+        if (!this.hospitalRef) {
+            throw new Error("Hospital not initiated");
+        }
+
+        const data = (await getDoc(this.hospitalRef)).data();
+        return data.hospitalName;
+    }
+
+    async setHospitalName(name) {
+        if (!this.hospitalRef) {
+            throw new Error("Hospital not initiated");
+        }
+
+        await updateDoc(this.hospitalRef, {
+            hospitalName: name
+        });
     }
 }

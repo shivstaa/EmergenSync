@@ -1,10 +1,14 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth, provider } from "../FireBase/Config.jsx";
 import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { getUserAuth, SetToken } from "../FireBase/SaveToken.jsx";
-import UserManager from "./UserManager.jsx";
+import UserManager from "../../Managers/userManager";
+
+
 function SignUpComp() {
+
   const userManager = new UserManager();
 
   const navigate = useNavigate();
@@ -50,7 +54,7 @@ function SignUpComp() {
         );
         const user = userCredential.user;
 
-        userManager.createUserDocument(user.uid, userInfo.userType);
+        await userManager.createUser(user.uid, userInfo.userType, user.email);
 
         SetToken(user, user.accessToken);
 
