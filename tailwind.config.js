@@ -8,5 +8,14 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      const newUtilities = {
+        '.caret-transparent': {
+          caretColor: 'transparent',
+        },
+      }
+      addUtilities(newUtilities, ['responsive', 'hover', 'focus', 'active']);
+    }
+  ],
 };

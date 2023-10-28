@@ -31,7 +31,7 @@ function HospitalProfile({ accountStateCheck }) {
       ...prevData,
       hospitalAddress: value,
     }));
-  };
+  };  
 
   return (
     <div className="hospital-profile h-[calc(100vh-84px)] bg-night flex flex-col items-center justify-center p-8 w-full">
