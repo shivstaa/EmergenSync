@@ -18,8 +18,8 @@ function NavBar() {
                     </Link>
                 ) : (
                     <>
-                        <Link to="/user">
-                            <button className="text-xl hover:underline bg-gray-700 px-4 py-2 rounded transition duration-200 ease-in-out transform hover:bg-gray-600">User</button>
+                        <Link to="/profile">
+                            <button className="text-xl hover:underline bg-gray-700 px-4 py-2 rounded transition duration-200 ease-in-out transform hover:bg-gray-600">Profile</button>
                         </Link>
 
                         <Link to="/hospital">

@@ -4,7 +4,7 @@ import {Link, useNavigate} from "react-router-dom";
 import {auth, provider} from "../FireBase/Config.jsx";
 import {createUserWithEmailAndPassword, signInWithPopup} from 'firebase/auth'
 import {getUserAuth, SetToken} from "../FireBase/SaveToken.jsx";
-import {UserManager} from "../FireBase/UserManager";
+import {UserManager} from "../FireBase/UserManager.jsx";
 
 function SignUpComp(){
 
@@ -56,7 +56,7 @@ function SignUpComp(){
 
                 SetToken(user, user.accessToken)
 
-                navigate('/user')
+                navigate('/profile')
             }
 
         } catch (error){
@@ -73,7 +73,7 @@ function SignUpComp(){
 
             SetToken(user, user.accessToken)
 
-            navigate('/user')
+            navigate('/profile')
 
         } catch (error) {
             setError(error.message)

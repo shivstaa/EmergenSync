@@ -8,7 +8,7 @@ import Home from "./Components/HomePage/Home.jsx";
 import Protected from "./Components/ProtectedPage/Protected.jsx";
 import NavBarLayout from "./Components/NavBarComp/NavBarLayout.jsx";
 import DashBoard from "./Pages/HospitalPage/DashBoard";
-
+import UserProfile from './Components/UserProfile/UserProfile';
 
 function App() {
 
@@ -20,7 +20,7 @@ function App() {
               <Route path={"/signup"} element={<SignUpComp />}></Route>
 
               <Route element={<ProtectLayout />}>
-                  <Route path={'/user'} element={<Protected />} />
+                  <Route path={'/profile'} element={<UserProfile />} />
                   <Route path={'/hospital'} element={<DashBoard />} />
               </Route>
           </Routes>

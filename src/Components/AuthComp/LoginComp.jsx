@@ -12,7 +12,7 @@ function LoginComp(){
 
     useEffect(() => {
         if (getToken()){
-            navigate("/user")
+            navigate("/profile")
         }
     }, [])
 
@@ -42,7 +42,7 @@ function LoginComp(){
 
             SetToken(user, user.accessToken)
 
-            navigate('/user')
+            navigate('/profile')
 
         } catch (error){
             setError(error.message)
@@ -58,7 +58,7 @@ function LoginComp(){
 
             SetToken(user, user.accessToken)
 
-            navigate('/user')
+            navigate('/profile')
 
         } catch (error) {
             setError(error.message)
