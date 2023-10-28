@@ -1,7 +1,5 @@
-
 import { Link } from "react-router-dom";
 import { AuthNav } from "./AuthNav.jsx";
-import EmergencyShareRoundedIcon from '@mui/icons-material/EmergencyShareRounded';
 
 function NavBar() {
     const { authUser, handleLogout } = AuthNav();

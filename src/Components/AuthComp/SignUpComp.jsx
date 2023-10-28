@@ -45,7 +45,6 @@ function SignUpComp(){
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-
         try {
 
             if (passwordMatch()){

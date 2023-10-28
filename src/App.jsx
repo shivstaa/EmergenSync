@@ -6,7 +6,6 @@ import ProtectLayout from "./Components/ProtectedLayout/ProtectLayout.jsx";
 import Home from "./Components/HomePage/Home.jsx";
 import Protected from "./Components/ProtectedPage/Protected.jsx";
 import NavBarLayout from "./Components/NavBarComp/NavBarLayout.jsx";
-import DashBoard from "./Pages/HospitalPage/DashBoard";
 
 
 function App() {
@@ -22,6 +21,8 @@ function App() {
                   <Route path={'/user'} element={<Protected />} />
                   <Route path={'/hospital'} element={<DashBoard />} />
               </Route>
+
+              <Route path={"/profile"} element={<UserProfile/>}></Route>
           </Routes>
       </NavBarLayout>
   )
