@@ -3,7 +3,7 @@ import {useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {auth, provider} from "../FireBase/Config.jsx";
 import {createUserWithEmailAndPassword, signInWithPopup} from 'firebase/auth'
-import {SetToken} from "../FireBase/SaveToken.jsx";
+import {getUserAuth, SetToken} from "../FireBase/SaveToken.jsx";
 
 
 function SignUpComp(){
@@ -14,7 +14,7 @@ function SignUpComp(){
         Email: "",
         Password: "",
         ConfirmPassword: "",
-        Type: ""
+        userType: ""
     })
 
     const [error, setError] = useState("")
@@ -43,12 +43,15 @@ function SignUpComp(){
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        console.log(userInfo)
+
         try {
 
             if (passwordMatch()){
 
                 const userCredential  = await createUserWithEmailAndPassword(auth, userInfo.Email, userInfo.Password)
                 const user = userCredential.user;
+
                 SetToken(user, user.accessToken)
 
                 navigate('/user')
@@ -79,7 +82,7 @@ function SignUpComp(){
 
 
     return (
-        <div className={"flex justify-center items-center min-h-screen"}>
+        <div className={"flex justify-center items-center h-[calc(100vh-84px)]"}>
             <div className={"bg-white p-5 w-full max-w-md border rounded-md space-y-7"}>
 
                 <div>
@@ -125,18 +128,19 @@ function SignUpComp(){
                     />
 
                     <div className="flex items-center justify-center">
-                        <div className="flex-grow border-b border-gray-300 h-0"></div>
-                        <h2 className="px-4 text-center">I am a</h2>
-                        <div className="flex-grow border-b border-gray-300 h-0"></div>
+                        <div className="flex-grow border-b border-gray-200 h-0"></div>
+                        <h2 className="px-4 text-center text-gray-400">I am a</h2>
+                        <div className="flex-grow border-b border-gray-200 h-0"></div>
                     </div>
 
-                    <div className="flex items-center justify-evenly">
+                    <div className="flex items-center justify-around border rounded py-2">
                         <div className="flex items-center">
-                            <input type="radio" name="name1" value="value1" id="paramedic" required />
+                            <input type="radio" onChange={handleAuthChange} name="userType" value="Paramedic" id="paramedic" required />
                             <label htmlFor="paramedic" className="ml-2">Paramedic</label>
                         </div>
-                        <div className="flex items-center">
-                            <input type="radio" name="name1" value="value2" id="hospital" />
+                        <div className="border-r-2 h-5 border-gray-200"></div>
+                        <div className="flex items-center ">
+                            <input type="radio" onChange={handleAuthChange} name="userType" value="Hospital" id="hospital" />
                             <label htmlFor="hospital" className="ml-2">Hospital</label>
                         </div>
                     </div>

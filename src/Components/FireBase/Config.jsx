@@ -6,7 +6,6 @@ import {getAuth, GoogleAuthProvider} from "firebase/auth"
 const firebaseConfig = {
     apiKey: "AIzaSyAnjhsDxvCyQ8AAGKisN9xyGbfvPToN8cw",
     authDomain: "emergensync-eb089.firebaseapp.com",
-    databaseURL: "https://swapwork-406a0-default-rtdb.firebaseio.com",
     projectId: "emergensync-eb089",
     storageBucket: "emergensync-eb089.appspot.com",
     messagingSenderId: "632325049802",

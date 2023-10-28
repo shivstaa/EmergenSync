@@ -5,9 +5,9 @@ function NavBar() {
     const { authUser, handleLogout } = AuthNav();
 
     return (
-        <div className="flex justify-between p-5 bg-gray-800 text-white shadow-lg">
+        <div className="flex justify-between items-center p-5 bg-gray-800 text-white shadow-lg">
             <Link to={'/'}>
-                <h1 className="text-2xl hover:underline font-bold">Example</h1>
+                <h1 className="text-2xl hover:underline font-semibold">Example</h1>
             </Link>
 
             <div className="space-x-5">
