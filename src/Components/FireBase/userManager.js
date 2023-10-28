@@ -1,62 +1,28 @@
-// FirebaseManager.js
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
-import { firebaseConfig } from './Config';  // Adjust the import path accordingly
+// UserManager.js
+import { doc, setDoc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { auth, provider } from "./FireBase/Config";
+import { getFirestore } from "firebase/firestore";
 
-class FirebaseManager {
+class UserManager {
   constructor() {
-    this.app = initializeApp(firebaseConfig);
-    this.auth = getAuth(this.app);
-    this.db = getFirestore(this.app);
+    this.db = getFirestore();
   }
 
-  // Authentication
-  async signUp(email, password) {
+  // Create or Update User Details
+  async saveUserDetails(uid, userDetails) {
+    const userRef = doc(this.db, 'Users', uid);
     try {
-      const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
-      return userCredential.user;
+      await setDoc(userRef, userDetails, { merge: true });  // Merge true to update existing fields without overwriting
     } catch (error) {
-      console.error("Error signing up: ", error.message);
+      console.error('Error saving user details: ', error);
       throw error;
     }
   }
 
-  async login(email, password) {
+  // Read User Details
+  async getUserDetails(uid) {
+    const userRef = doc(this.db, 'Users', uid);
     try {
-      const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
-      return userCredential.user;
-    } catch (error) {
-      console.error("Error logging in: ", error.message);
-      throw error;
-    }
-  }
-
-  async logout() {
-    try {
-      await signOut(this.auth);
-    } catch (error) {
-      console.error("Error logging out: ", error.message);
-      throw error;
-    }
-  }
-
-  // User Management
-  async addUser(userType, user) {
-    try {
-      const userRef = doc(this.db, 'Users', user.uid);
-      await setDoc(userRef, {
-        userType: userType,
-        ...user
-      });
-    } catch (error) {
-      console.error("Error adding user: ", error.message);
-      throw error;
-    }
-  }
-
-  async getUser(uid) {
-    try {
-      const userRef = doc(this.db, 'Users', uid);
       const userSnap = await getDoc(userRef);
       if (userSnap.exists()) {
         return userSnap.data();
@@ -64,12 +30,39 @@ class FirebaseManager {
         throw new Error('User does not exist');
       }
     } catch (error) {
-      console.error("Error getting user: ", error.message);
+      console.error('Error getting user details: ', error);
       throw error;
     }
   }
 
-  // Additional methods for setting and getting other data can be added here...
+  // Create or Update Emergency Request
+  async saveEmergencyRequest(requestId, emergencyRequest) {
+    const requestRef = doc(this.db, 'EmergencyRequests', requestId);
+    try {
+      await setDoc(requestRef, emergencyRequest, { merge: true });
+    } catch (error) {
+      console.error('Error saving emergency request: ', error);
+      throw error;
+    }
+  }
+
+  // Read Emergency Request
+  async getEmergencyRequest(requestId) {
+    const requestRef = doc(this.db, 'EmergencyRequests', requestId);
+    try {
+      const requestSnap = await getDoc(requestRef);
+      if (requestSnap.exists()) {
+        return requestSnap.data();
+      } else {
+        throw new Error('Emergency request does not exist');
+      }
+    } catch (error) {
+      console.error('Error getting emergency request: ', error);
+      throw error;
+    }
+  }
+
+  // Additional methods for deleting users or emergency requests can be added here...
 }
 
-export default FirebaseManager;
+export default UserManager;
