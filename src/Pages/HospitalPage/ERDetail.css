@@ -1,0 +1,20 @@
+
+.custom-scrollbar {
+    overflow-y: scroll;
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: transparent transparent; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-color: transparent transparent; /* Chrome and Edge */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 5px; /* Width of the vertical scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}

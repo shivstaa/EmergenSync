@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { AuthNav } from "./AuthNav.jsx";
 
@@ -7,7 +8,7 @@ function NavBar() {
     return (
         <div className="flex justify-between items-center p-5 bg-gray-800 text-white shadow-lg">
             <Link to={'/'}>
-                <h1 className="text-2xl hover:underline font-semibold flex items-center"><EmergencyShareRoundedIcon fontSize={"middle"}/>EmergenSync</h1>
+                <h1 className="text-2xl hover:underline font-semibold flex items-center">EmergenSync</h1>
             </Link>
 
             <div className="space-x-5">

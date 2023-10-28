@@ -2,9 +2,9 @@
 import { doc, setDoc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 import { collection } from "firebase/firestore";
+import {db} from "./Config";
 
-
-class UserManager {
+export class UserManager {
   constructor() {
     this.db = getFirestore();
   }
@@ -182,7 +182,17 @@ class UserManager {
       throw error;
     }
   }
+
+  async createUserDocument(uid, userType) {
+    const userRef = doc(db, "User", uid); // Use doc to reference a specific document
+    try {
+      await setDoc(userRef, { userType }); // Use setDoc to set the document data
+      console.log("Document successfully written!");
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      throw error;
+    }
+  }
 }
   
 
-export default UserManager;

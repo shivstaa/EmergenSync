@@ -28,7 +28,7 @@ function RoomDetails({ roomData, toggleRoomActive }) {
             <button
                 onClick={openShowDetail}
                 className={`m-2 w-40 h-32 rounded cursor-pointer ${
-                    roomActive ? 'bg-green-500' : 'bg-red-500'
+                    roomActive ? 'bg-green-500 border-4 border-green-300' : 'bg-red-500 border-4 border-red-300'
                 } flex flex-col justify-center items-center text-white transform transition-transform hover:scale-105`}
             >
                 <span className="text-xl font-semibold">{roomName}</span>
