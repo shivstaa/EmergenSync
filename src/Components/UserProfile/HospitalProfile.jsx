@@ -15,9 +15,11 @@ function HospitalProfile({ accountStateCheck }) {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: name === 'totalCapacity' ? parseInt(value, 10) : value,
     }));
-  };
+};
+
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -105,15 +107,16 @@ function HospitalProfile({ accountStateCheck }) {
           <input
             type="number"
             id="totalCapacity"
-            name="totalCapacity"
-            value={formData.totalCapacity}
+            name="totalCapacity"  
+            value={formData.totalCapacity}  
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+            min="0"
+            className="w-full p-2 border border-gray-700 rounded"
           />
         </div>
         <button
           type="submit"
-          className="bg-blue-500 text-white w-full py-3 rounded hover-bg-blue-600 transition duration-300"
+          className="bg-blue-500 text-white w-full py-3 rounded hover:bg-blue-600 transition duration-300"
         >
           {accountStateCheck ? (
             <div className={"flex justify-center items-center gap-3"}>

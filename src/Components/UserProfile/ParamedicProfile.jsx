@@ -8,11 +8,20 @@ function ParamedicProfile() {
     navigate("/request");
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission
+    // first name, last name
+    
+  };
+  
   return (
     <div className="paramedic-profile">
-      <button onClick={handleRequestCreation} className="btn btn-primary">
+        <form onSubmit={handleSubmit}  className="bg-night p-6 rounded shadow-lg w-[33vw] h-[65vh]"
+></form>
+      {/* <button onClick={handleRequestCreation} className="btn btn-primary">
         Create Request
-      </button>
+      </button> */}
     </div>
   );
 }
