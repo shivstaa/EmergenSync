@@ -12,21 +12,14 @@ function TestHospitalManager() {
     // const userManager  = new UserManager();
     // console.log("new user: ", userManager.getUserType(testUserId));
     // Create an instance of HospitalManager
-    const hospitalManager = new HospitalManager(testUserId);
+    (async () => {
+      const hospitalManager = await HospitalManager.create(testUserId);
+      console.log("avaialable rooms: "+ hospitalManager.getAvailableRooms());
+      hospitalManager.addHospitalRoom("NewRoom 156");
+      console.log("avaialable rooms: "+ hospitalManager.getAvailableRooms());
+  })();
 
-    // Define hospital details
-    const geolocation = { lat: 0, lon: 0 };  // Replace with actual geolocation
-    const hospitalName = 'Test Hospital';
-    const roomCapacity = 10;
 
-    // Call createHospital method to add a new hospital
-    hospitalManager.createHospital(testUserId, geolocation, hospitalName, roomCapacity)
-      .then(() => {
-        console.log('Hospital created successfully');
-      })
-      .catch(error => {
-        console.error('Error creating hospital:', error);
-      });
   }, []);
 
   return (

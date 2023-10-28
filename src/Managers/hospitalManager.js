@@ -6,28 +6,30 @@ export default class HospitalManager {
     constructor(uid) {
         this.uid = uid;  // Store uid for later use
         this.hospitalRef = null;  // Initialize hospitalRef to null
-        this.getHospitalFromUser(uid).then(hospitalRef => {
-            this.hospitalRef = hospitalRef;
-        });
-        this.hospitalCollection = collection(db, 'Hospital');
+        this.hospitalCollection = collection(db, 'Hospital');  // Reference to the Hospital collection
+        this.initializeHospitalRef(uid);  // Initialize or update hospitalRef
     }
 
-    async getHospitalFromUser(uid) {
+    static async create(uid) {
+        const manager = new HospitalManager(uid);
+        await manager.initializeHospitalRef(uid);
+        return manager;
+    }
+    
+    async initializeHospitalRef(uid) {
         const userDoc = await getDoc(doc(db, 'User', uid));
         if (!userDoc.exists) {
             throw new Error(`User document with uid ${uid} does not exist`);
         }
         const userData = userDoc.data();
-        console.log(userData);
-        if (!userData || !userData.typeID) {
-            throw new Error(`User data or typeID field is missing for uid ${uid}`);
+        if (userData && userData.typeID) {
+            this.hospitalRef = doc(db, 'Hospital', userData.typeID);  // Update hospitalRef with existing reference
+        } else {
+            await this.createHospital(uid);  // Create a new hospital instance if none exists
         }
-        // Since userData.typeID is already a DocumentReference, use it directly
-        return userData.typeID;
     }
-    
-    
-    async createHospital(uid, geolocation, name, capacity) {
+
+    async createHospital(uid, geolocation = {}, name = '', capacity = 0) {
         if (!this.hospitalRef) {
             // Creating a new hospital document
             const newHospitalRef = await this.hospitalCollection.add({
