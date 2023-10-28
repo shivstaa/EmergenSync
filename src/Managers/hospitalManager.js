@@ -38,7 +38,6 @@ export default class HospitalManager {
         }
     }
 
-
     async updateHospital(uid, name = '', address = "", capacity = 0) {
         if (!this.hospitalRef) {
             // Creating a new hospital document
@@ -59,13 +58,21 @@ export default class HospitalManager {
             });
 
             // Add rooms to the new hospital
-            for (var i = 0; i < capacity; i++) {
-                await this.addHospitalRoom("");  // Assuming room name can be empty string
+            for (let i = 0; i < capacity; i++) {
+                await this.addHospitalRoom("");  // Assuming room name can be an empty string
             }
         } else {
-            throw new Error("Hospital already initiated");
+            // Handle the case where the hospital is already initiated
+            // You can choose to update the hospital information here or throw an error.
+            // For example, you can update the hospital name and address.
+            await updateDoc(this.hospitalRef, {
+                hospitalName: name,
+                address: address,
+                totalRooms: capacity
+            });
         }
     }
+
 
     async addHospitalRoom(roomName) {
         if (!this.hospitalRef) {
@@ -148,5 +155,14 @@ export default class HospitalManager {
         await updateDoc(this.hospitalRef, {
             hospitalName: name
         });
+    }
+
+    async getHospitalData() {
+        if (!this.hospitalRef) {
+            throw new Error("Hospital not initiated");
+
+        }
+        const data = (await getDoc(this.hospitalRef)).data();
+        return data;
     }
 }

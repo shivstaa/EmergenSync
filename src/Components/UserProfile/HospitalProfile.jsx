@@ -8,22 +8,28 @@ import HospitalManager from "../../Managers/hospitalManager";
 import CircularProgress from "@mui/joy/CircularProgress";
 
 function HospitalProfile({ userUID }) {
+
   const [accountStateCheck, setAccountStateCheck] = useState(null);
 
   const [formData, setFormData] = useState({
     hospitalName: "",
     hospitalAddress: "",
-    totalCapacity: "",
+    totalCapacity: 0,
   });
 
   useEffect(() => {
     async function fetchUserData() {
       try {
         const hospitalManager = await HospitalManager.create(userUID);
-        const hospitalName = await hospitalManager.getHospitalName();
+        const hospitalData = await hospitalManager.getHospitalData();
 
+        setFormData({
+          hospitalName: hospitalData.hospitalName,
+          hospitalAddress: hospitalData.address,
+          totalCapacity: hospitalData.totalRooms,
+        });
 
-        setAccountStateCheck(hospitalName);
+        setAccountStateCheck(hospitalData.hospitalName);
       } catch (error) {
         console.error("Error fetching user data: ", error);
       }
@@ -40,8 +46,12 @@ function HospitalProfile({ userUID }) {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const hospitalManager = await HospitalManager.create(userUID);
+    await hospitalManager.updateHospital(userUID, formData.hospitalName, formData.hospitalAddress, formData.totalCapacity);
+
     console.log("Form Data:", formData);
   };
 
