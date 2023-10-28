@@ -14,15 +14,16 @@ import Protected from "./Components/ProtectedPage/Protected.jsx";
 import NavBarLayout from "./Components/NavBarComp/NavBarLayout.jsx";
 import DashBoard from "./Pages/HospitalPage/DashBoard";
 import UserProfile from "./Components/UserProfile/UserProfile";
+import TestHospitalManager from './Components/Tests/TestHospitalManager';
 
 function App() {
   return (
     <NavBarLayout>
       <Routes>
         <Route path={"/"} element={<Home />}></Route>
+        <Route path={"/test"} element={<TestHospitalManager />}></Route>
         <Route path={"/login"} element={<LoginComp />}></Route>
         <Route path={"/signup"} element={<SignUpComp />}></Route>
-
         <Route element={<ProtectLayout />}>
           <Route path={"/profile"} element={<UserProfile />} />
           <Route path={"/hospital"} element={<DashBoard />} />
