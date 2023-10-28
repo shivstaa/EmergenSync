@@ -68,7 +68,7 @@ function LoginComp(){
     }
 
     return (
-        <div className={"flex justify-center items-center min-h-screen"}>
+        <div className={"flex justify-center items-center h-[calc(100vh-84px)]"}>
             <div className={"bg-white p-5 w-full max-w-md border rounded-md space-y-7"}>
 
                 <div>

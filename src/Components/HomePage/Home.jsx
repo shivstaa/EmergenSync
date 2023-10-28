@@ -1,10 +1,10 @@
-import { getToken } from "../FireBase/SaveToken.jsx";
+
 
 function Home() {
     return (
         <div className="h-[calc(100vh-84px)] flex flex-col justify-center items-center bg-gradient-to-r from-blue-500 to-purple-500 text-white">
             <div className="text-center mb-12">
-                <h1 className="text-6xl font-extrabold mb-4 animate__animated animate__fadeIn">Welcome to Our Platform</h1>
+                <h1 className="text-6xl font-extrabold mb-4 animate__animated animate__fadeIn">Welcome to EmergenSync</h1>
                 <p className="text-xl font-light">Discover amazing features and enjoy a seamless experience.</p>
             </div>
 
