@@ -9,6 +9,7 @@ import Protected from "./Components/ProtectedPage/Protected.jsx";
 import NavBarLayout from "./Components/NavBarComp/NavBarLayout.jsx";
 import DashBoard from "./Pages/HospitalPage/DashBoard";
 import UserProfile from './Components/UserProfile/UserProfile';
+import ProfileProtectLayout from "./Components/ProtectedLayout/ProfileProtectLayout";
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
                   <Route path={'/profile'} element={<UserProfile />} />
                   <Route path={'/hospital'} element={<DashBoard />} />
               </Route>
+
           </Routes>
       </NavBarLayout>
   )
