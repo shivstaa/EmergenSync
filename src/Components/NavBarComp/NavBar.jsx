@@ -1,45 +1,36 @@
+import { Link } from "react-router-dom";
+import { AuthNav } from "./AuthNav.jsx";
 
-import {Link} from "react-router-dom";
-import {AuthNav} from "./AuthNav.jsx";
-function NavBar(){
-
+function NavBar() {
     const { authUser, handleLogout } = AuthNav();
 
-
     return (
-        <div className={"flex justify-between p-5"}>
-
+        <div className="flex justify-between p-5 bg-gray-800 text-white shadow-lg">
             <Link to={'/'}>
-                <h1 className={"text-2xl hover:underline"}>Example</h1>
+                <h1 className="text-2xl hover:underline font-bold">Example</h1>
             </Link>
 
-
-            <div className={"space-x-5"}>
-
+            <div className="space-x-5">
                 {authUser === null ? (
                     <Link to="/login">
-                        <button className="text-xl hover:underline">Login</button>
+                        <button className="text-xl hover:underline bg-gray-700 px-4 py-2 rounded transition duration-200 ease-in-out transform hover:bg-gray-600">Login</button>
                     </Link>
                 ) : (
                     <>
                         <Link to="/user">
-                            <button className="text-xl hover:underline">User</button>
+                            <button className="text-xl hover:underline bg-gray-700 px-4 py-2 rounded transition duration-200 ease-in-out transform hover:bg-gray-600">User</button>
                         </Link>
 
                         <Link to={"/"}>
-                            <button onClick={handleLogout} className="text-red-500 text-xl hover:underline">
+                            <button onClick={handleLogout} className="text-xl bg-red-500 px-4 py-2 rounded transition duration-200 ease-in-out transform hover:bg-red-400 text-white hover:underline">
                                 Logout
                             </button>
                         </Link>
                     </>
                 )}
-
             </div>
-
         </div>
-    )
-
-
+    );
 }
 
 export default NavBar;

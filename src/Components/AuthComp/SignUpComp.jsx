@@ -13,7 +13,8 @@ function SignUpComp(){
     const [userInfo, setUserInfo] = useState({
         Email: "",
         Password: "",
-        ConfirmPassword: ""
+        ConfirmPassword: "",
+        Type: ""
     })
 
     const [error, setError] = useState("")
@@ -122,6 +123,24 @@ function SignUpComp(){
                         onChange={handleAuthChange}
                         required
                     />
+
+                    <div className="flex items-center justify-center">
+                        <div className="flex-grow border-b border-gray-300 h-0"></div>
+                        <h2 className="px-4 text-center">I am a</h2>
+                        <div className="flex-grow border-b border-gray-300 h-0"></div>
+                    </div>
+
+                    <div className="flex items-center justify-evenly">
+                        <div className="flex items-center">
+                            <input type="radio" name="name1" value="value1" id="paramedic" required />
+                            <label htmlFor="paramedic" className="ml-2">Paramedic</label>
+                        </div>
+                        <div className="flex items-center">
+                            <input type="radio" name="name1" value="value2" id="hospital" />
+                            <label htmlFor="hospital" className="ml-2">Hospital</label>
+                        </div>
+                    </div>
+
 
                     <div className={"space-y-0.5"}>
 
