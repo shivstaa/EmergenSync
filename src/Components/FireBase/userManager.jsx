@@ -1,7 +1,7 @@
 // UserManager.js
 import { doc, setDoc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
-import { auth, provider } from "./FireBase/Config";
 import { getFirestore } from "firebase/firestore";
+import { collection } from "firebase/firestore";
 
 
 class UserManager {
@@ -67,95 +67,122 @@ class UserManager {
 
   async addHospitalRoom(uid, roomId, roomName) {
     const userRef = doc(this.db, 'Users', uid);
-    try {
-      await updateDoc(userRef, {
-        rooms: [...rooms, { roomId: roomId, roomName: roomName, availability: true }]
-      });
-
-    } catch (error) {
-      console.error('Error adding hospital room: ', error);
-      throw error;
-    }
+    const userDoc = await getDoc(userRef);
+    const data = userDoc.data();
+    await updateDoc(userRef, {
+      totalRooms: data.totalRooms + 1,
+      availableRooms: data.availableRooms + 1
+    });
   }
 
   async changeRoomAvailability(uid, roomId) {
     const userRef = doc(this.db, 'Users', uid);
-    try {
-      await updateDoc(userRef, {
-        rooms: [...rooms, { roomId: roomId, roomName: roomName, availability: !availability }]
-      });
-
-    } catch (error) {
-      console.error('Error changing room availability: ', error);
-      throw error;
-    }
+    const userDoc = await getDoc(userRef);
+    const data = userDoc.data();
+    const rooms = data.rooms;
+    const availableRooms = data.availableRooms;
+    const roomsRef = collection(this.db, 'Users', uid, 'rooms');
+    const roomDoc = doc(roomsRef, roomId);
+    const roomRef = await getDoc(roomDoc);
+    await updateDoc(roomDoc, { availability: !roomRef.availability });
+    await updateDoc(userRef, {
+      rooms: [...rooms, roomDoc],
+      availableRooms: roomRef.availability ? availableRooms + 1 : availableRooms - 1
+    });
   }
 
   async deleteHospitalRoom(uid, roomId) {
     const userRef = doc(this.db, 'Users', uid);
-    try {
-      await updateDoc(userRef, {
-        rooms: [...rooms.filter(room => room.roomId !== roomId)]
-      });
-
-    } catch (error) {
-      console.error('Error deleting hospital room: ', error);
-      throw error;
-    }
+    const userDoc = await getDoc(userRef);
+    const data = userDoc.data();
+    await updateDoc(userRef, {
+      rooms: data.rooms.filter(room => room.roomId !== roomId),
+      totalRooms: data.totalRooms - 1
+    });
   }
 
-  async createRequest(uid, patientName, patientPain) {
+  async findNearestHospital(uid) {
     const userRef = doc(this.db, 'Users', uid);
-
-    try {
-      const geolocation = userRef.geolocation;
-      let distance = Infinity;
-      let nearestHospital = null;
-
-      const querySnapshot = await this.db.collection('Users')
-        .where('type', '==', 'Hospital')
-        .where('availability', '==', true)
-        .get();
-
-      querySnapshot.forEach((doc) => {
-        const dist_to_hospital = Math.sqrt(
-          (geolocation.latitude - doc.data().geolocation.latitude) ** 2 +
-          (geolocation.longitude - doc.data().geolocation.longitude) ** 2
-        );
-
-        if (dist_to_hospital < distance) {
-          distance = dist_to_hospital;
-          nearestHospital = doc;
-        }
-      });
-
-      if (!nearestHospital) {
-        throw new Error('No available hospitals found.');
+    const geolocation = userRef.geolocation;
+  
+    const querySnapshot = await this.db.collection('Users')
+      .where('type', '==', 'Hospital')
+      .where('availability', '==', true)
+      .get();
+  
+    let nearestHospital = null;
+    let distance = Infinity;
+  
+    querySnapshot.forEach((doc) => {
+      const dist_to_hospital = Math.sqrt(
+        (geolocation.latitude - doc.data().geolocation.latitude) ** 2 +
+        (geolocation.longitude - doc.data().geolocation.longitude) ** 2
+      );
+  
+      if (dist_to_hospital < distance) {
+        distance = dist_to_hospital;
+        nearestHospital = doc;
       }
-
+    });
+  
+    if (!nearestHospital) {
+      throw new Error('No available hospitals found.');
+    }
+  
+    return nearestHospital;
+  }
+  
+  async findAvailableRoom(hospitalRef) {
+    let room = null;
+  
+    for (let i = 0; i < hospitalRef.rooms.length; i++) {
+      if (hospitalRef.rooms[i].availability) {
+        room = hospitalRef.rooms[i];
+        break;
+      }
+    }
+  
+    if (!room) {
+      throw new Error('No available rooms found.');
+    }
+  
+    return room;
+  }
+  
+  async createRequest(uid, patientName, patientPain) {
+    try {
+      const nearestHospital = await this.findNearestHospital(uid);
       const hospitalRef = doc(this.db, 'Users', nearestHospital.id);
-
+  
       if (!hospitalRef.availability) {
         throw new Error('Hospital is not available');
       }
-
-      await updateDoc(hospitalRef, { availability: false });
+  
+      const room = await this.findAvailableRoom(hospitalRef);
+  
+      //Update room availability
+      await updateDoc(hospitalRef, {
+        rooms: [...hospitalRef.rooms, { ...room, availability: false }],
+        availableRooms: hospitalRef.availableRooms - 1
+      });
     } catch (error) {
       console.error('Error finding or updating nearest hospital:', error);
       throw error;
     }
-
-    timestamp = new Date().getTime();
+  
+    let timestamp = new Date().getTime();
     try {
+      const userRef = doc(this.db, 'Users', uid);
       await updateDoc(userRef, {
         requests: { patientName: patientName, patientPain: patientPain, timestamp: timestamp }
       });
     }
     catch (error) {
-      console.error('Error creating request: ', error);
+      console.error('Error updating user requests:', error);
       throw error;
     }
   }
 }
+  
 
 export default UserManager;

@@ -4,7 +4,7 @@ import {Link, useNavigate} from "react-router-dom";
 import {auth, provider} from "../FireBase/Config.jsx";
 import {createUserWithEmailAndPassword, signInWithPopup} from 'firebase/auth'
 import {getUserAuth, SetToken} from "../FireBase/SaveToken.jsx";
-
+import UserManager from "../FireBase/userManager.jsx";
 
 function SignUpComp(){
 
@@ -51,6 +51,7 @@ function SignUpComp(){
 
                 const userCredential  = await createUserWithEmailAndPassword(auth, userInfo.Email, userInfo.Password)
                 const user = userCredential.user;
+                
 
                 SetToken(user, user.accessToken)
 
