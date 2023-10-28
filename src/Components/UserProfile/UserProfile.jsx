@@ -3,7 +3,7 @@ import ParamedicProfile from "./ParamedicProfile";
 import HospitalProfile from "./HospitalProfile";
 
 function UserProfile() {
-  const [profileType, setProfileType] = useState("Paramedic");
+  const [profileType, setProfileType] = useState("Hospital");
   const firstTime = true;
 
   const renderProfile = () => {

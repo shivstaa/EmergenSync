@@ -54,6 +54,7 @@ function HospitalProfile({ accountStateCheck }) {
             value={formData.hospitalName}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+            required
           />
         </div>
         <div className="mb-4">
@@ -64,6 +65,7 @@ function HospitalProfile({ accountStateCheck }) {
           <PlacesAutocomplete
             value={formData.hospitalAddress}
             onChange={handleSelect}
+            required
           >
             {({
               getInputProps,
@@ -72,7 +74,7 @@ function HospitalProfile({ accountStateCheck }) {
               loading,
             }) => (
               <div>
-                <input
+                <input required
                   {...getInputProps({
                     placeholder: "Search Places ...",
                     className:
@@ -112,6 +114,7 @@ function HospitalProfile({ accountStateCheck }) {
             onChange={handleChange}
             min="0"
             className="w-full p-2 border border-gray-700 rounded"
+            required  
           />
         </div>
         <button
