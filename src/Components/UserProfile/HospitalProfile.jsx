@@ -6,16 +6,22 @@ import { FaInfinity } from "react-icons/fa";
 import { AiFillEdit } from "react-icons/ai";
 import HospitalManager from "../../Managers/hospitalManager";
 import CircularProgress from "@mui/joy/CircularProgress";
+import {Alert, AlertTitle} from "@mui/material";
+import SlidingAlert from "../SideTools/SlidingAlert";
 
 function HospitalProfile({ userUID }) {
 
   const [accountStateCheck, setAccountStateCheck] = useState(null);
+
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const [formData, setFormData] = useState({
     hospitalName: "",
     hospitalAddress: "",
     totalCapacity: 0,
   });
+
 
   useEffect(() => {
     async function fetchUserData() {
@@ -52,7 +58,18 @@ function HospitalProfile({ userUID }) {
     const hospitalManager = await HospitalManager.create(userUID);
     await hospitalManager.updateHospital(userUID, formData.hospitalName, formData.hospitalAddress, formData.totalCapacity);
 
+    setAccountStateCheck(formData.hospitalName);
+
+    if (accountStateCheck) {
+      setAlertMessage("Hospital Profile Updated!" );
+    } else {
+      setAlertMessage("Hospital Created!");
+    }
+
+    setShowAlert(true);
+
     console.log("Form Data:", formData);
+
   };
 
   const handleSelect = (value) => {
@@ -173,6 +190,13 @@ function HospitalProfile({ userUID }) {
             )}
           </button>
         </form>
+
+        <SlidingAlert
+            message={alertMessage}
+            visible={showAlert}
+            onClose={() => setShowAlert(false)}
+        />
+
       </div>
   );
 }
