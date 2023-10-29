@@ -1,5 +1,6 @@
-import { doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs } from "firebase/firestore";
-import {db} from "../Components/FireBase/Config";
+import { doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "../Components/FireBase/Config";
+import geohash from 'ngeohash';
 
 export default class HospitalManager {
     constructor(uid) {
@@ -20,17 +21,7 @@ export default class HospitalManager {
             throw new Error(`User document with uid ${uid} does not exist`);
         }
 
-        const hospitalCollection = collection(db, 'Hospital');
-        const querySnapshot = await getDocs(hospitalCollection);
-
-        querySnapshot.forEach((doc) => {
-            if (doc.data().userID === uid) {
-                this.hospitalRef = doc.ref;
-                return;
-            }
-        });
-
-        const userData = await userDoc.data();
+        const userData = userDoc.data();
         if (userData && userData.typeID) {
             this.hospitalRef = doc(db, 'Hospital', userData.typeID);  // Update hospitalRef with existing reference
         } else {
@@ -38,17 +29,24 @@ export default class HospitalManager {
         }
     }
 
-    async updateHospital(uid, name = '', address = "", capacity = 0) {
-        if (!this.hospitalRef) {
+    async updateHospital(uid, name = '', address = "", capacity = 0, geoLocation = { latitude: 0, longitude: 0 }) {
+        const geoHash = geohash.encode(geoLocation.lat, geoLocation.lng);
+        console.log("backend update", geoHash);
+
+        try {
+
             // Creating a new hospital document
-            const newHospitalRef = await doc(collection(db, 'Hospital'));
+            const newHospitalRef = doc(collection(db, 'Hospital'));
+            const geoHash = geohash.encode(geoLocation.lat, geoLocation.lng);
+
             await setDoc(newHospitalRef, {
                 userID: uid,
                 hospitalName: name,
-                availableRooms: 0,
-                totalRooms: 0,
-                address: address,
-                rooms: []
+                hospitalAddress: address,
+                availableRooms: capacity,
+                totalRooms: capacity,
+                geoLocation: geoLocation,
+                geoHash: geoHash,
             });
             this.hospitalRef = newHospitalRef;  // Update hospitalRef with the new reference
 
@@ -58,64 +56,105 @@ export default class HospitalManager {
             });
 
             // Add rooms to the new hospital
-            for (let i = 0; i < capacity; i++) {
-                await this.addHospitalRoom("");  // Assuming room name can be an empty string
+            if (capacity > 0) {
+                const roomCollectionRef = collection(this.hospitalRef, 'Rooms'); // Reference to the subcollection
+
+                for (let i = 0; i < capacity; i++) {
+                    const roomDocRef = doc(roomCollectionRef); // Create a new room document
+                    await setDoc(roomDocRef, {
+                        roomName: "", // You can add room-specific data here
+                        isAvailable: true,
+                        isHold: false,
+                        patientinRoom: "",
+                        lastUpdated: new Date().getTime(),
+                    });
+                }
+            } else {
+                const geoHash = geohash.encode(geoLocation.lat, geoLocation.lng);
+                // Handle the case where the hospital is already initiated
+                // You can choose to update the hospital name and address here.
+                await updateDoc(this.hospitalRef, {
+                    hospitalName: name,
+                    hospitalAddress: address,
+                    totalRooms: capacity,
+                    geoHash: geoHash
+                });
             }
-        } else {
-            // Handle the case where the hospital is already initiated
-            // You can choose to update the hospital information here or throw an error.
-            // For example, you can update the hospital name and address.
-            await updateDoc(this.hospitalRef, {
-                hospitalName: name,
-                address: address,
-                totalRooms: capacity
+            console.log("Hospital updated successfully!");
+        } catch (error) {
+            console.error("Error updating hospital:", error);
+        }
+    }
+
+
+    async addHospitalRoom(roomName = "") {
+        if (!this.hospitalRef) {
+            throw new Error("Hospital not initiated");
+        }
+
+        try {
+            // Reference the "Rooms" subcollection within the hospital document
+            const roomCollectionRef = collection(this.hospitalRef, 'Rooms');
+
+            // Create a new document in the "Rooms" subcollection for the room
+            const roomDocRef = doc(roomCollectionRef);
+
+            const room = {
+                roomName: roomName,
+                isAvailable: true,
+                isHold: false,
+                patientinRoom: "",
+                lastUpdated: new Date().getTime(),
+            };
+
+            // Set the room document data
+            await setDoc(roomDocRef, room);
+
+            // Update the counts in the main hospital document
+            const data = (await getDoc(this.hospitalRef)).data();
+            const updatedData = {
+                totalRooms: (data.totalRooms || 0) + 1,
+                availableRooms: (data.availableRooms || 0) + 1,
+            };
+
+            await updateDoc(this.hospitalRef, updatedData);
+            console.log("Room added successfully!");
+        } catch (error) {
+            console.error("Error adding hospital room:", error);
+        }
+    }
+
+    async updateRoomAvailability(roomID, isAvailable, isHold, patientinRoom) {
+        if (!this.hospitalRef) {
+            throw new Error("Hospital not initiated");
+        }
+
+        try {
+            // Reference the "Rooms" subcollection within the hospital document
+            const roomCollectionRef = collection(this.hospitalRef, 'Rooms');
+
+            // Reference the room document
+            const roomDocRef = doc(roomCollectionRef, roomID);
+
+            // Update the room document data
+            await updateDoc(roomDocRef, {
+                isAvailable: isAvailable,
+                isHold: isHold,
+                patientinRoom: patientinRoom,
+                lastUpdated: new Date().getTime(),
             });
+
+            // Update the counts in the main hospital document
+            const data = (await getDoc(this.hospitalRef)).data();
+            const updatedData = {
+                availableRooms: (data.availableRooms || 0) + (isAvailable ? 1 : -1),
+            };
+
+            await updateDoc(this.hospitalRef, updatedData);
+            console.log("Room updated successfully!");
+        } catch (error) {
+            console.error("Error updating hospital room:", error);
         }
-    }
-
-
-    async addHospitalRoom(roomName) {
-        if (!this.hospitalRef) {
-            throw new Error("Hospital not initiated");
-        }
-
-        const data = (await getDoc(this.hospitalRef)).data();
-
-        let room = {
-            roomName: roomName,
-            isAvailable: true,
-            lastUpdated: new Date()  // Set the lastUpdated field to the current date and time
-        }
-
-
-        await updateDoc(this.hospitalRef, {
-            totalRooms: data.totalRooms + 1,
-            availableRooms: data.availableRooms + 1,
-            rooms: [...data.rooms, room]
-        });
-    }
-
-    async updateRoomAvailability(roomIndex, isAvailable) {
-        if (!this.hospitalRef) {
-            throw new Error("Hospital not initiated");
-        }
-
-        const data = (await getDoc(this.hospitalRef)).data();
-        if (roomIndex < 0 || roomIndex >= data.rooms.length) {
-            throw new Error("Invalid room index");
-        }
-
-        const updatedRooms = data.rooms.map((room, index) => {
-            if (index === roomIndex) {
-                return {...room, isAvailable, lastUpdated: new Date()};
-            }
-            return room;
-        });
-
-        await updateDoc(this.hospitalRef, {
-            availableRooms: updatedRooms.filter(room => room.isAvailable).length,
-            rooms: updatedRooms
-        });
     }
 
     async getAvailableRooms() {
@@ -165,4 +204,37 @@ export default class HospitalManager {
         const data = (await getDoc(this.hospitalRef)).data();
         return data;
     }
+
+    async getRooms() {
+        if (!this.hospitalRef) {
+            throw new Error("Hospital not initiated");
+        }
+    
+        const roomsCollectionRef = collection(this.hospitalRef, 'Rooms');
+        const roomsQuerySnapshot = await getDocs(roomsCollectionRef);
+    
+        // Initialize an object to store the rooms data
+        const roomsData = {};
+    
+        roomsQuerySnapshot.forEach((roomDoc) => {
+            roomsData[roomDoc.id] = roomDoc.data();
+        });
+    
+        return roomsData;
+    }
+        
+
+    async updateGeoLocation(geoLocation) {
+        if (!this.hospitalRef) {
+            throw new Error("Hospital not initiated");
+        }
+
+        const geoHash = geohash.encode(geoLocation.lat, geoLocation.lng);
+
+        await updateDoc(this.hospitalRef, {
+            geoLocation: geoLocation,
+            geoHash: geoHash
+        });
+    }
+
 }

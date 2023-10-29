@@ -23,10 +23,10 @@ function HospitalProfile({ userUID }) {
       try {
         const hospitalManager = await HospitalManager.create(userUID);
         const hospitalData = await hospitalManager.getHospitalData();
-
+        console.log(hospitalData)
         setFormData({
           hospitalName: hospitalData.hospitalName,
-          hospitalAddress: hospitalData.address,
+          hospitalAddress: hospitalData.hospitalAddress,
           totalCapacity: hospitalData.totalRooms,
         });
 
@@ -64,6 +64,7 @@ function HospitalProfile({ userUID }) {
         };
 
         const hospitalManager = await HospitalManager.create(userUID);
+        console.log(updatedFormData);
         await hospitalManager.updateHospital(userUID, updatedFormData.hospitalName, updatedFormData.hospitalAddress, updatedFormData.totalCapacity, updatedFormData.hospitalGeoLocation);
 
         setAccountStateCheck(updatedFormData.hospitalName);
