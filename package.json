@@ -20,6 +20,7 @@
     "firebase": "^10.5.2",
     "geofire-common": "^6.0.0",
     "geofirestore": "^5.2.0",
+    "net": "^1.0.2",
     "ngeohash": "^0.6.3",
     "postcss": "^8.4.31",
     "prettier": "^3.0.3",
@@ -35,7 +36,8 @@
     "tailwindcss": "^3.3.5",
     "turf": "^3.0.14",
     "us-state-codes": "^1.1.2",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "why-is-node-running": "^2.2.2"
   },
   "scripts": {
     "start": "react-scripts start",
