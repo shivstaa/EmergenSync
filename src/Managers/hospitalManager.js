@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs } from "firebase/firestore";
 import {db} from "../Components/FireBase/Config";
 
 export default class HospitalManager {
@@ -20,15 +20,17 @@ export default class HospitalManager {
             throw new Error(`User document with uid ${uid} does not exist`);
         }
 
-        const hospitalQuery = query(this.hospitalCollection, where("userID", "==", uid));
-        const querySnapshot = await getDocs(hospitalQuery);
-    
-        if (!querySnapshot.empty) {
-            this.hospitalRef = querySnapshot.docs[0].ref;
-            return;
-        }
+        const hospitalCollection = collection(db, 'Hospital');
+        const querySnapshot = await getDocs(hospitalCollection);
 
-        const userData = userDoc.data();
+        querySnapshot.forEach((doc) => {
+            if (doc.data().userID === uid) {
+                this.hospitalRef = doc.ref;
+                return;
+            }
+        });
+
+        const userData = await userDoc.data();
         if (userData && userData.typeID) {
             this.hospitalRef = doc(db, 'Hospital', userData.typeID);  // Update hospitalRef with existing reference
         } else {
@@ -39,7 +41,7 @@ export default class HospitalManager {
     async updateHospital(uid, name = '', address = "", capacity = 0) {
         if (!this.hospitalRef) {
             // Creating a new hospital document
-            const newHospitalRef = doc(collection(db, 'Hospital')); 
+            const newHospitalRef = await doc(collection(db, 'Hospital'));
             await setDoc(newHospitalRef, {
                 userID: uid,
                 hospitalName: name,
