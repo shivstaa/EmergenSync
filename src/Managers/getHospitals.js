@@ -1,26 +1,6 @@
 const axios = require("axios");
 const api_key = "AIzaSyB29yN9o9YQdUNc8BcepzN5RmjD4e3dBV4"; // Please replace with your actual API key
 
-// Function to geocode address using Google Maps Geocoding API
-async function geocodeAddress(address) {
-  try {
-    const response = await axios.get(
-      "https://maps.googleapis.com/maps/api/geocode/json",
-      {
-        params: {
-          address: address,
-          key: api_key,
-        },
-      }
-    );
-    const location = response.data.results[0].geometry.location;
-    return location;
-  } catch (error) {
-    console.error("Error geocoding address: ", error);
-    throw error;
-  }
-}
-
 // Function to get nearby hospitals using Google Places API
 async function getNearbyHospitals(latitude, longitude) {
   try {
@@ -73,7 +53,6 @@ async function getDistanceAndTime(origin, destinations, hospitalDetails) {
     const response = await axios.get(url);
     const { rows } = response.data;
     const elements = rows[0].elements;
-
     return destinations.map((address, index) => {
       const { distance, duration } = elements[index];
       const hospital = hospitalDetails[index];
