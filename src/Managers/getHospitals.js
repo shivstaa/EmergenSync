@@ -25,7 +25,8 @@ async function getNearbyHospitals(latitude, longitude) {
         params: {
           location: `${latitude},${longitude}`,
           radius: 48280,  // 30 miles in meters
-          type: 'hospital',
+          keyword: 'hospital',
+          
           key: api_key
         }
       });
