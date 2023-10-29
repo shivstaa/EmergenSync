@@ -1,18 +1,14 @@
-
 import React, { useEffect, useState } from "react";
 import PlacesAutocomplete from "react-places-autocomplete";
-import { FaHospital, FaPencilAlt, FaMapMarkedAlt } from "react-icons/fa";
-import { FaInfinity } from "react-icons/fa";
+import { FaHospital, FaPencilAlt, FaMapMarkedAlt, FaInfinity } from "react-icons/fa";
 import { AiFillEdit } from "react-icons/ai";
 import HospitalManager from "../../Managers/hospitalManager";
 import CircularProgress from "@mui/joy/CircularProgress";
-import {Alert, AlertTitle} from "@mui/material";
+import { Alert, AlertTitle } from "@mui/material";
 import SlidingAlert from "../SideTools/SlidingAlert";
 
 function HospitalProfile({ userUID }) {
-
   const [accountStateCheck, setAccountStateCheck] = useState(null);
-
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
@@ -21,7 +17,6 @@ function HospitalProfile({ userUID }) {
     hospitalAddress: "",
     totalCapacity: 0,
   });
-
 
   useEffect(() => {
     async function fetchUserData() {
@@ -55,21 +50,36 @@ function HospitalProfile({ userUID }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const hospitalManager = await HospitalManager.create(userUID);
-    await hospitalManager.updateHospital(userUID, formData.hospitalName, formData.hospitalAddress, formData.totalCapacity);
+    const geocoder = new window.google.maps.Geocoder();
 
-    setAccountStateCheck(formData.hospitalName);
+    geocoder.geocode({ address: formData.hospitalAddress }, async (results, status) => {
+      if (status === "OK") {
+        const location = results[0].geometry.location;
+        const lat = location.lat();
+        const lng = location.lng();
 
-    if (accountStateCheck) {
-      setAlertMessage("Hospital Profile Updated!" );
-    } else {
-      setAlertMessage("Hospital Created!");
-    }
+        const updatedFormData = {
+          ...formData,
+          hospitalGeoLocation: { lat, lng },
+        };
 
-    setShowAlert(true);
+        const hospitalManager = await HospitalManager.create(userUID);
+        await hospitalManager.updateHospital(userUID, updatedFormData.hospitalName, updatedFormData.hospitalAddress, updatedFormData.totalCapacity, updatedFormData.hospitalGeoLocation);
 
-    console.log("Form Data:", formData);
+        setAccountStateCheck(updatedFormData.hospitalName);
 
+        if (accountStateCheck) {
+          setAlertMessage("Hospital Profile Updated!");
+        } else {
+          setAlertMessage("Hospital Created!");
+        }
+
+        setShowAlert(true);
+        console.log("Form Data:", updatedFormData);
+      } else {
+        console.error("Geocode was not successful for the following reason: " + status);
+      }
+    });
   };
 
   const handleSelect = (value) => {
@@ -81,16 +91,16 @@ function HospitalProfile({ userUID }) {
 
   if (accountStateCheck === null) {
     return (
-        <div className="hospital-profile h-[calc(100vh-84px)] bg-night flex flex-col items-center justify-center p-8 w-full">
-          <CircularProgress size={"lg"} />
-          <p className="text-2xl text-white mt-4">Loading...</p>
-        </div>
+      <div className="hospital-profile h-[calc(100vh-84px)] bg-night flex flex-col items-center justify-center p-8 w-full">
+        <CircularProgress size={"lg"} />
+        <p className="text-2xl text-white mt-4">Loading...</p>
+      </div>
     );
   }
 
   return (
-      <div className="hospital-profile h-[calc(100vh-84px)] bg-night flex flex-col items-center justify-center p-8 w-full">
-        <form
+    <div className="hospital-profile h-[calc(100vh-84px)] bg-night flex flex-col items-center justify-center p-8 w-full">
+<form
             onSubmit={handleSubmit}
             className="bg-gray-800 p-6 rounded shadow-lg w-[80%] md:w-[50%] lg:w-[40%]"
         >
@@ -198,7 +208,7 @@ function HospitalProfile({ userUID }) {
         />
 
       </div>
-  );
+    );
 }
 
 export default HospitalProfile;

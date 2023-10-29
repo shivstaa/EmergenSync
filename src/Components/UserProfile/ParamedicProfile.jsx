@@ -64,6 +64,7 @@ function ParamedicProfile({ accountStateCheck }) {
               value={formData.paramedicFirstName}
               onChange={handleChange}
               placeholder="First Name"
+              required
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
             />
           </div>
@@ -77,6 +78,7 @@ function ParamedicProfile({ accountStateCheck }) {
               value={formData.paramedicLastName}
               onChange={handleChange}
               placeholder="Last Name"
+              required
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
             />
           </div>
@@ -90,10 +92,11 @@ function ParamedicProfile({ accountStateCheck }) {
             mask="(999)-999-9999"
             id="paramedicPhone"
             name="paramedicPhone"
-            placeholder="(___) ___-____"
+            placeholder="(___)-___-____"
             value={formData.paramedicPhone}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+            required
           />
         </div>
 
@@ -105,7 +108,8 @@ function ParamedicProfile({ accountStateCheck }) {
             value={stateOptions.find(option => option.value === formData.paramedicState)}
             onChange={handleStateChange}
             options={stateOptions}
-            menuPlacement="bottom"  // Force the dropdown to always open downwards
+            menuPlacement="bottom"  
+            required
             className="caret-transparent w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
           />
         </div>

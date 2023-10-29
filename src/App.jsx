@@ -15,7 +15,7 @@ import NavBarLayout from "./Components/NavBarComp/NavBarLayout.jsx";
 import DashBoard from "./Pages/HospitalPage/DashBoard";
 import UserProfile from "./Components/UserProfile/UserProfile";
 import TestHospitalManager from './Components/Tests/TestHospitalManager';
-
+import FindRoom from "./Pages/ParamedicPage/FindRooms";
 function App() {
   return (
     <NavBarLayout>
@@ -27,6 +27,7 @@ function App() {
         <Route element={<ProtectLayout />}>
           <Route path={"/profile"} element={<UserProfile />} />
           <Route path={"/hospital"} element={<DashBoard />} />
+          <Route path={"/find"} element={<FindRoom/>}/>
         </Route>
       </Routes>
     </NavBarLayout>
