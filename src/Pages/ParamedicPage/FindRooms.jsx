@@ -1,29 +1,76 @@
 import React, { useState, useRef, useEffect } from "react";
-import {getIntersection} from '../../Managers/hospitalComparator'
+import axios from "axios";
 
 const FindRoom = () => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+
+    function fetchData() {
+        // Replace with your API Gateway URL
+        const apiUrl = 'https://oez4waiiel.execute-api.us-east-2.amazonaws.com/prod';
+    
+        fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                // Add any other headers if necessary
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data); // Handle your data here
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error.message);
+        });
+    }
+
+    fetchData
+    // async function fetchData() {
+    //     const url = "https://oez4waiiel.execute-api.us-east-2.amazonaws.com/prod";
+    //     const dataToSend =  ;
+        
+    //     try {
+    //         const response = await axios.get(url, { headers: { 'Content-Type': 'text/plain' }, data: dataToSend });
+    //         setData(response.data); // Assuming the response contains the data you need.
+    //         console.log(response.data)
+    //         setLoading(false);
+    //     } catch (error) {
+    //         console.error(error);
+    //         setLoading(false); // Set loading to false even in case of an error.
+    //     }
+    // }
+
+    // useEffect(() => {
+    //     fetchData()
+    // }, [])
+
+//useEffect(() => {
+
         // This function gets the user's location and fetches hospital data
-        const fetchData = async () => {
-          navigator.geolocation.getCurrentPosition(async (position) => {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
+        // const fetchData = async () => {
+        //   navigator.geolocation.getCurrentPosition(async (position) => {
+        //     const latitude = position.coords.latitude;
+        //     const longitude = position.coords.longitude;
+
+        //     const hospitals = await getIntersection({ lat: latitude, lng: longitude });
+        //     console.log("Received data: ", hospitals)
+        //     setData(hospitals);
+        //     setLoading(false);
+        //   }, (error) => {
+        //     console.error("Error getting location", error);
+        //     setLoading(false);
+        //   });
+        // };
     
-            const hospitals = await getIntersection({ lat: latitude, lng: longitude });
-            console.log("Received data: ", hospitals)
-            setData(hospitals);
-            setLoading(false);
-          }, (error) => {
-            console.error("Error getting location", error);
-            setLoading(false);
-          });
-        };
-    
-        fetchData();
-      }, []);
+        // fetchData();
+      //}, []);
 
       if (loading) {
         return <div>Loading...</div>; // Or any other loading component you might have
