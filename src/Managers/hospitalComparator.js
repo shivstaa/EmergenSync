@@ -1,6 +1,6 @@
 const { getDocs, collection, query, where } = require('firebase/firestore');
 const { db } = require("./Config.js");
-const { getHospitals } = require('./getHospitals.js'); // Import getHospitals from getHospitals.js
+const { getHospitals, getDistanceAndTime, getNearbyHospitals } = require('./getHospitals.js'); // Import getHospitals from getHospitals.js
 const geohash = require('ngeohash');  // Ensure you have the ngeohash package installed
 
 async function getHospitalDetailsAndDistances(origin, hospitals) {
@@ -17,23 +17,28 @@ async function getHospitalDetailsAndDistances(origin, hospitals) {
 
 async function findIntersection(firebaseHospitals, searchHospitals) {
     const intersectedHospitals = [];
-    console.log("Search ", searchHospitals[0]);
-    console.log("firebase ", firebaseHospitals[0]);
+    const seenHospitalIds = new Set();
     for (let searchHospital of searchHospitals) {
       for (let firebaseHospital of firebaseHospitals) {
         const distance = Math.hypot(
-          firebaseHospital.lat - searchHospital.latitude,
-          firebaseHospital.longitude - searchHospital.longitude
+          firebaseHospital.geoLocation.lat - searchHospital.latitude,
+          firebaseHospital.geoLocation.lng - searchHospital.longitude
         );
   
         const isSameHospital = distance < 0.0002844; // distance in degrees for approx 1000 ft
         if (isSameHospital) {
-          intersectedHospitals.push(firebaseHospital);
-        }
+          // console.log("SAME ENCOUNTER", searchHospital);
+          intersectedHospitals.push({
+            ...firebaseHospital,
+            distanceFromAddr: searchHospital.distanceFromAddr,
+            travelTime: searchHospital.travelTime
+        });
+       }
       }
     }
   
-    return intersectedHospitals;
+    return intersectedHospitals.filter((item, 
+      index) => intersectedHospitals.indexOf(item) === index);
   }
   
 
@@ -58,17 +63,21 @@ function getBoundingBox(latitude, longitude, distanceInKm) {
 
 async function getIntersection(origin) {
   // Step 1: Fetch hospitals from Firebase within 50km of the origin
-   const hospitalCollection = collection(db, 'Hospital');
-  const boundingBox = getBoundingBox(origin.lat, origin.lng, 50);  // Assume getBoundingBox is a function to get the bounding box
-  const nearbyQuery = hospitalCollection.where('geohash', '>=', boundingBox.minGeohash).where('geohash', '<=', boundingBox.maxGeohash);
-  
+  const hospitalCollection = collection(db, 'Hospital');
+  const boundingBox = getBoundingBox(origin.lat, origin.lng, 50);
+  const nearbyQuery = query(
+      hospitalCollection,
+      where('geoHash', '>=', boundingBox.minGeohash),
+      where('geoHash', '<=', boundingBox.maxGeohash)
+  );
+
   const firebaseHospitalsSnap = await getDocs(nearbyQuery);
   const firebaseHospitals = firebaseHospitalsSnap.docs.map(doc => doc.data());
-
+  // console.log("Firebase hospitals that fall under the query: ", firebaseHospitals);
   // Step 2: Fetch hospitals from the Google Places API
   const searchHospitals = await getHospitals(origin);  // Assuming getHospitals is defined
   const detailsAndDistances = await getHospitalDetailsAndDistances(origin, searchHospitals);
-
+  // console.log("Search Results from the origin", searchHospitals);
   // Step 3: Find the intersection of the two sets
   const intersectedHospitals = await findIntersection(firebaseHospitals, detailsAndDistances);
 
@@ -76,8 +85,8 @@ async function getIntersection(origin) {
 }
 
 const origin = {
-    latitude: 37.7895567,
-    longitude: -122.416863
+    lat: 37.7895567,
+    lng: -122.416863
 };
 
 getIntersection(origin)

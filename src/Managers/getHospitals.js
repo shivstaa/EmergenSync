@@ -26,7 +26,6 @@ async function getNearbyHospitals(latitude, longitude) {
           location: `${latitude},${longitude}`,
           radius: 48280,  // 30 miles in meters
           keyword: 'hospital',
-          
           key: api_key
         }
       });
@@ -54,7 +53,6 @@ async function getDistanceAndTime(origin, destinations, hospitalDetails) {
     const formattedUserLocation = `${origin.lat},${origin.lng}`;  // Adjusted this line to use the origin parameter
     const formattedDestinations = destinations.join('|');  // destinations is already an array of addresses
     const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(formattedUserLocation)}&destinations=${encodeURIComponent(formattedDestinations)}&units=imperial&key=${api_key}`;
-
     try {
         const response = await axios.get(url);
         const { rows } = response.data;
@@ -78,3 +76,4 @@ async function getDistanceAndTime(origin, destinations, hospitalDetails) {
 }
 
 
+module.exports = {getNearbyHospitals, getDistanceAndTime,  getHospitals };

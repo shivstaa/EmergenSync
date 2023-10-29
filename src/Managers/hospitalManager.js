@@ -29,9 +29,8 @@ export default class HospitalManager {
         }
     }
 
-    async updateHospital(uid, name = '', address = "", capacity = 0, geoLocation = { latitude: 0, longitude: 0 }) {
+    async updateHospital(uid, name = '', address = "", capacity = 0, geoLocation = { lat: 0, lng: 0 }) {
         const geoHash = geohash.encode(geoLocation.lat, geoLocation.lng);
-        console.log("backend update", geoHash);
 
         try {
 
