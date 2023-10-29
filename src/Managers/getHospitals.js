@@ -50,7 +50,7 @@ async function getHospitals(location) {
   }
 
 // Function to get distance and time from user location to hospitals
-async function getDistanceAndTime(origin, destinations) {
+async function getDistanceAndTime(origin, destinations, hospitalDetails) {
     const formattedUserLocation = `${origin.lat},${origin.lng}`;  // Adjusted this line to use the origin parameter
     const formattedDestinations = destinations.join('|');  // destinations is already an array of addresses
     const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(formattedUserLocation)}&destinations=${encodeURIComponent(formattedDestinations)}&units=imperial&key=${api_key}`;
@@ -62,8 +62,12 @@ async function getDistanceAndTime(origin, destinations) {
 
         return destinations.map((address, index) => {
             const { distance, duration } = elements[index];
+            const hospital = hospitalDetails[index];
             return {
-                name: address,  // Note: This will be the address, not the hospital name
+                hospital_name: hospital.name,
+                hospital_address: address,
+                latitude: hospital.latitude,
+                longitude: hospital.longitude,
                 distanceFromAddr: distance.text,
                 travelTime: duration.text
             };
@@ -73,16 +77,4 @@ async function getDistanceAndTime(origin, destinations) {
     }
 }
 
-// Assume your address is '1600 Amphitheatre Parkway, Mountain View, CA'
-const origin = {
-    lat: 37.4219999,
-    lng: -122.0840575
-};
 
-getHospitals(origin)
-    .then(hospitals => {
-        const hospitalAddresses = hospitals.map(hospital => hospital.vicinity);
-        return getDistanceAndTime(origin, hospitalAddresses);
-    })
-    .then(distancesAndTimes => console.log(distancesAndTimes))
-    .catch(error => console.error(error));
