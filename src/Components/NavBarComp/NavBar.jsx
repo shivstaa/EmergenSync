@@ -31,10 +31,10 @@ function NavBar() {
               </button>
             </Link>
 
-            <Link to="/hospital">
+            <Link to="/find">
               <button className="flex items-center gap-2 text-xl hover:underline bg-gray-700 px-4 py-2 rounded transition duration-200 ease-in-out transform hover:bg-gray-600">
                 <FaHospital />
-                Hospital
+                Create Request
               </button>
             </Link>
 

@@ -4,6 +4,7 @@ import { FaUserMd, FaPhone } from "react-icons/fa";
 import InputMask from "react-input-mask";
 import statesHash from './states_hash.json';  // Import the JSON file
 import Select from 'react-select';  // Import react-select
+import SlidingAlert from "../SideTools/SlidingAlert";
 
 function ParamedicProfile({ accountStateCheck }) {
   // const navigate = useNavigate();
@@ -13,6 +14,8 @@ function ParamedicProfile({ accountStateCheck }) {
     paramedicPhone: "",
     paramedicState: ""
   })
+
+  const [showAlert, setShowAlert] = useState(false)
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,6 +40,7 @@ function ParamedicProfile({ accountStateCheck }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Form Data:", formData);
+    setShowAlert(true)
   };
 
   // Prepare options for the state dropdown
@@ -131,6 +135,12 @@ function ParamedicProfile({ accountStateCheck }) {
           )}
         </button>
       </form>
+
+      <SlidingAlert
+      message={"Profile Updated"}
+      visible={showAlert}
+      onClose={() => setShowAlert(false)}/>
+
     </div>
     
   );

@@ -1,108 +1,73 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
+import { doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, query, where } from "firebase/firestore";
 
 const FindRoom = () => {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
-
-
-    function fetchData() {
-        // Replace with your API Gateway URL
-        const apiUrl = 'https://oez4waiiel.execute-api.us-east-2.amazonaws.com/prod';
     
-        fetch(apiUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                // Add any other headers if necessary
-            },
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log(data); // Handle your data here
-        })
-        .catch(error => {
-            console.error('There was a problem with the fetch operation:', error.message);
-        });
-    }
-
-    fetchData
-    // async function fetchData() {
-    //     const url = "https://oez4waiiel.execute-api.us-east-2.amazonaws.com/prod";
-    //     const dataToSend =  ;
+    const data = {
+        0: {
+        hospitalName: "Allegra Hospital",
+        address: "13494 Allegra Royale Ave, Tempe, AZ",
+        distance: 0.2,
+        estimatedTime: 15,
+        thumbnail: "https://thumbs.dreamstime.com/b/hospital-building-modern-parking-lot-59693686.jpg",
+        rooms_available: 45,
+        rooms_reserved: 5,
+        rooms_used: 18,
+        },
+        1: {
+        hospitalName: "Habitual Hospital",
+        address: "13494 Allegra Royale Ave, Tempe, AZ",
+        distance: 0.2,
+        estimatedTime: 25,
+        thumbnail:
+            "https://wehco.media.clients.ellingtoncms.com/img/photos/2022/01/20/PB1_hospital_0121.jpg",
+        rooms_available: 45,
+        rooms_reserved: 5,
+        rooms_used: 18,
+        },
+        2: {
+            hospitalName: "Mercy General Hospital",
+            address: "4001 J Street, Sacramento, CA",
+            distance: 1.5,
+            estimatedTime: 30,
+            thumbnail: "https://www.ucsf.edu/sites/default/files/2021-12/New_Parnassus_Hospital_rendering_from_Hillway_social_card.jpg",
+            rooms_available: 60,
+            rooms_reserved: 10,
+            rooms_used: 25,
+        },
+        3: {
+            hospitalName: "Sunrise Hospital",
+            address: "3186 S Maryland Pkwy, Las Vegas, NV",
+            distance: 0.8,
+            estimatedTime: 20,
+            thumbnail: "https://www.medelita.com/media/wysiwyg/blog/Wayfinding_Hospitals.jpg",
+            rooms_available: 75,
+            rooms_reserved: 15,
+            rooms_used: 30,
+        },
+        4: {
+            hospitalName: "Providence Hospital",
+            address: "1150 Varnum St NE, Washington, DC",
+            distance: 2.0,
+            estimatedTime: 40,
+            thumbnail: "https://www.clarkpacific.com/wp-content/uploads/2016/09/1442_SFGeneral_STAR.jpg",
+            rooms_available: 50,
+            rooms_reserved: 8,
+            rooms_used: 20,
+        },
+        5: {
+            hospitalName: "Lakeview Hospital",
+            address: "630 E Medical Dr, Bountiful, UT",
+            distance: 1.2,
+            estimatedTime: 25,
+            thumbnail: "https://s3-prod.modernhealthcare.com/s3fs-public/styles/800x600/public/NEWS_180219951_AR_0_LZPHZNGBWJJQ.jpg",
+            rooms_available: 40,
+            rooms_reserved: 6,
+            rooms_used: 15,
+        },
         
-    //     try {
-    //         const response = await axios.get(url, { headers: { 'Content-Type': 'text/plain' }, data: dataToSend });
-    //         setData(response.data); // Assuming the response contains the data you need.
-    //         console.log(response.data)
-    //         setLoading(false);
-    //     } catch (error) {
-    //         console.error(error);
-    //         setLoading(false); // Set loading to false even in case of an error.
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     fetchData()
-    // }, [])
-
-//useEffect(() => {
-
-        // This function gets the user's location and fetches hospital data
-        // const fetchData = async () => {
-        //   navigator.geolocation.getCurrentPosition(async (position) => {
-        //     const latitude = position.coords.latitude;
-        //     const longitude = position.coords.longitude;
-
-        //     const hospitals = await getIntersection({ lat: latitude, lng: longitude });
-        //     console.log("Received data: ", hospitals)
-        //     setData(hospitals);
-        //     setLoading(false);
-        //   }, (error) => {
-        //     console.error("Error getting location", error);
-        //     setLoading(false);
-        //   });
-        // };
-    
-        // fetchData();
-      //}, []);
-
-      if (loading) {
-        return <div>Loading...</div>; // Or any other loading component you might have
-      }
-    
-      if (!data || data.length === 0) {
-        return <div>No hospitals found</div>;
-      }
-//   const data = {
-//     0: {
-//       hospitalName: "Allegra Hospital",
-//       address: "13494 Allegra Royale Ave, Tempe, AZ",
-//       distance: 0.2,
-//       estimatedTime: 15,
-//       thumbnail: "image_url",
-//       rooms_available: 45,
-//       rooms_reserved: 5,
-//       rooms_used: 18,
-//     },
-//     1: {
-//       hospitalName: "Habitual Hospital",
-//       address: "13494 Allegra Royale Ave, Tempe, AZ",
-//       distance: 0.2,
-//       estimatedTime: 25,
-//       thumbnail:
-//         "https://wehco.media.clients.ellingtoncms.com/img/photos/2022/01/20/PB1_hospital_0121.jpg",
-//       rooms_available: 45,
-//       rooms_reserved: 5,
-//       rooms_used: 18,
-//     },
-    // ... more data
-//  };
+    };
   
 
   const HospitalComponent = ({ hospitalData }) => {
@@ -146,6 +111,7 @@ const FindRoom = () => {
           sex: sex,
         };
         console.log("Form Data:", formData);
+        // addPatientToRoom("TWYIhuJzsscNJRWEwRCkX0S2hkr2", formData.firstName + " " +  formData.lastName, formData.dob, formData.sex, formData.patientPain)
       };
 
 
